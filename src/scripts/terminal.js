@@ -1,37 +1,31 @@
 function Terminal() {
-    let cmdLine;
-    let output;
-    let prompt;
     let history = [];
     let historyPos = 0;
-    let terminalHeight = 10;
 
     function init() {
-        cmdLine = document.querySelector(".input");
-        prompt = document.querySelector(".prompt");
-        output = document.querySelector("output");
-
-        setPrompt("[user@host] > ");
-        cmdLine.addEventListener("keydown", processCommand);
-        cmdLine.addEventListener("keydown", navigateHistory);
+        _cmdLine.addEventListener("keydown", processCommand);
+        _cmdLine.addEventListener("keydown", navigateHistory);
     }
 
     function processCommand(e) {
-        if (e.keyCode == 13 && this.value && this.value.trim()) {
-            let cmd = this.value.trim();
-            this.value = "";
-
-            if (history.length == 0 || history[history.length - 1] != cmd) {
-                history[history.length] = cmd;
-                historyPos = history.length;
-            }
-
-            output.insertAdjacentHTML("beforeEnd", "<p>" + cmd + "</p>");
-            if (output.children.length > terminalHeight) {
-                output.children[0].remove();
-            }
-            console.log(history);
+        if (e.keyCode != 13 || !this.value || !this.value.trim()) {
+            return;
         }
+
+        const cmd = this.value.trim();
+        this.value = "";
+
+        if (history.length == 0 || history[history.length - 1] != cmd) {
+            history[history.length] = cmd;
+            historyPos = history.length;
+        }
+
+        _output.insertAdjacentHTML("beforeEnd", "<p>" + _prompt.textContent + cmd + "</p>");
+        if (_output.children.length > _maxLines) {
+            _output.children[0].remove();
+        }
+
+        runCommand(cmd.split(" "));
     }
 
     function navigateHistory(e) {
@@ -53,12 +47,5 @@ function Terminal() {
         }
     }
 
-    function setPrompt(value) {
-        prompt.textContent = value;
-        console.log("set")
-    }
-
     init();
 }
-
-terminal = new Terminal();
